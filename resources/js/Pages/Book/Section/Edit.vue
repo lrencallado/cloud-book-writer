@@ -22,6 +22,8 @@ const props = defineProps({
 const titleInput = ref(null);
 const showModal = ref(false);
 
+const tinyMceApiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
+
 const subsectionForm = useForm({
     title: ''
 });
@@ -76,7 +78,7 @@ const closeModal = () => {
             <div class="md:w-[70%] bg-white p-4 grid content-center">
                 <!-- Content for the second column -->
                 <Editor
-                    api-key="bzxbb2elsezrdwy7536kcb2rd609de6551hz2opwpxyzg0x7"
+                    :api-key="tinyMceApiKey"
                     :init="{
                         plugins: 'lists link image table code help wordcount'
                     }"
