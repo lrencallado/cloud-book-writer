@@ -1,5 +1,12 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import Modal from '@/Components/Modal.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
+import InputLabel from '@/Components/InputLabel.vue'
+import InputError from '@/Components/InputError.vue'
+import { ref } from 'vue';
 
 defineProps({
     canLogin: {
@@ -8,15 +15,29 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
 });
+
+const showModal = ref(false);
+const titleInput = ref(null);
+
+const form = useForm({
+    title: '',
+});
+
+const closeModal = () => {
+    showModal.value = false;
+    form.reset();
+};
+
+const createBook = () => {
+    form.post(route('book.store'), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
+        onError: () => titleInput.value.focus(),
+        onFinish: () => form.reset(),
+    });
+}
+
 </script>
 
 <template>
@@ -65,6 +86,42 @@ defineProps({
             </div>
 
             <div class="mt-16">
+                <button class="p-2 bg-emerald-400 my-2 rounded-md text-white" @click="showModal = true">Create Book</button>
+                <Modal :show="showModal">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900">
+                            Create a book
+                        </h2>
+                        <div class="mt-6">
+                            <InputLabel for="title" value="title" class="sr-only" />
+
+                            <TextInput
+                                id="title"
+                                ref="titleInput"
+                                v-model="form.title"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="Title"
+                                @keyup.enter="createBook"
+                            />
+
+                            <InputError :message="form.errors.title" class="mt-2" />
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+
+                            <PrimaryButton
+                                class="ml-3"
+                                :class="{ 'opacity-25': form.processing }"
+                                :disabled="form.processing"
+                                @click="createBook"
+                            >
+                                Create
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </Modal>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                     <a
                         href="https://laravel.com/docs"
@@ -313,10 +370,6 @@ defineProps({
                             Sponsor
                         </a>
                     </div>
-                </div>
-
-                <div class="ml-4 text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                    Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
                 </div>
             </div>
         </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BookController extends Controller
 {
@@ -28,7 +29,17 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255|unique:books',
+        ]);
+
+        $book = Book::create([
+            'title' => $request->title
+        ]);
+
+        $book->addCollaborator($request->user(), 'Author');
+
+        return Inertia::location("book/{$book->id}");
     }
 
     /**
@@ -36,7 +47,10 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        return Inertia::render('Book/Show', [
+            'book' => $book,
+            'sections' => $book->sections()->get()
+        ]);
     }
 
     /**

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
+use App\Models\Section;
 use App\Models\SubSection;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SubSectionController extends Controller
 {
@@ -26,9 +29,21 @@ class SubSectionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Book $book, Section $section)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255|unique:sub_sections'
+        ]);
+
+        SubSection::create([
+            'title' => $request->title,
+            'section_id' => $section->id
+        ]);
+
+        return Inertia::render('Book/Section/Edit', [
+            'book' => $book,
+            'sections' => $book->sections()->get(),
+        ]);
     }
 
     /**
@@ -42,9 +57,13 @@ class SubSectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SubSection $subSection)
+    public function edit(Book $book, Section $section, SubSection $subSection)
     {
-        //
+        return Inertia::render('Book/Section/Subsection/Edit', [
+            'book' => $book,
+            'sections' => $book->sections()->get(),
+            'current_subsection' => $subSection
+        ]);
     }
 
     /**

@@ -9,6 +9,14 @@ class Section extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'book_id',
+        'content',
+    ];
+
+    protected $with = ['subSections'];
+
     public function book()
     {
         return $this->belongsTo(Book::class);

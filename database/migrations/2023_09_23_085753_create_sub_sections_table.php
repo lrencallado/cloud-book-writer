@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('sub_sections', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
+            $table->longText('content')->nullable();
             $table->unsignedBigInteger('section_id');
-            $table->unsignedBigInteger('sub_section_id');
             $table->timestamps();
         });
     }
