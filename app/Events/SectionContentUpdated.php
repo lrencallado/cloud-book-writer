@@ -32,4 +32,9 @@ class SectionContentUpdated
     {
         return new PrivateChannel('book.section.' . $this->section->id);
     }
+
+    public function broadcastAs()
+  {
+      return 'section-content-updated';
+  }
 }

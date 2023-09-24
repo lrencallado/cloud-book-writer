@@ -25,6 +25,8 @@ Echo.private(`book.section.${props.current_section.id}`)
         props.current_section = e.section;
 });
 
+console.log(Echo)
+
 const titleInput = ref(null);
 const showModal = ref(false);
 

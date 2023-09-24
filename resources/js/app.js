@@ -17,9 +17,9 @@ window.Echo = new Echo({
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     encrypted: true,
     wsHost: window.location.hostname,
+    csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     wsPort: 6001,
-    forceTLS: false,
-    disableStats: true,
+    forceTLS: true,
 });
 
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubsectionController;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -52,6 +53,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('book.section.subsection', SubsectionController::class);
 
     Route::resource('collaborator-request', CollaboratorRequestController::class);
+
+});
+
+Route::post('/broadcasting/auth', function(Request $request) {
+    if (!$request->user()) {
+        return abort(403, 'Unauthorized');
+    }
+
+    // Return the authenticated user's information
+    return $request->user();
 });
 
 require __DIR__.'/auth.php';
