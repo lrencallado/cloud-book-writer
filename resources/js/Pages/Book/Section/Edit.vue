@@ -21,8 +21,7 @@ const props = defineProps({
 
 Echo.private(`book.section.${props.current_section.id}`)
     .listen('.section-content-updated', function(e) {
-        console.log(e)
-        props.current_section = e.section;
+        editorForm.content = e.section.content;
 });
 
 console.log(Echo)
