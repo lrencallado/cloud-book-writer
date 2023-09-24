@@ -19,7 +19,7 @@ const props = defineProps({
     current_section: {},
 });
 
-Echo.channel('book.section.' + props.current_section.id)
+Echo.private(`book.section.${props.current_section.id}`)
     .listen('SectionContentUpdated', (e) => {
         console.log(e)
         props.current_section = e.section;

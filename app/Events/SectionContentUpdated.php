@@ -15,12 +15,10 @@ class SectionContentUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected $section;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(Section $section)
+    public function __construct(public Section $section)
     {
         $this->section = $section;
     }
@@ -30,10 +28,8 @@ class SectionContentUpdated
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): Channel
     {
-        return [
-            new Channel('book.section.' . $this->section->id),
-        ];
+        return new PrivateChannel('book.section.' . $this->section->id);
     }
 }
