@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Section;
+use App\Models\Subsection;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,16 +11,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SectionContentUpdated implements ShouldBroadcast
+class SubsectionContentUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public Section $section)
+    public function __construct(public Subsection $subsection)
     {
-        $this->section = $section;
+        $this->subsection = $subsection;
     }
 
     /**
@@ -30,11 +30,11 @@ class SectionContentUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): PrivateChannel
     {
-        return new PrivateChannel('book.section.' . $this->section->id);
+        return new PrivateChannel('book.section.subsection.' . $this->subsection->id);
     }
 
     public function broadcastAs()
     {
-        return 'section-content-updated';
+        return 'subsection-content-updated';
     }
 }

@@ -19,13 +19,6 @@ const props = defineProps({
     current_section: {},
 });
 
-Echo.private(`book.section.${props.current_section.id}`)
-    .listen('.section-content-updated', function(e) {
-        editorForm.content = e.section.content;
-});
-
-console.log(Echo)
-
 const titleInput = ref(null);
 const showModal = ref(false);
 
@@ -37,6 +30,11 @@ const subsectionForm = useForm({
 
 const editorForm = useForm({
     content: props.current_section.content
+});
+
+Echo.private(`book.section.${props.current_section.id}`)
+    .listen('.section-content-updated', function(e) {
+        editorForm.content = e.section.content;
 });
 
 const createSubsection = () => {

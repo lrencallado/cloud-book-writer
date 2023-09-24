@@ -20,6 +20,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('book.section.{id}', function ($id) {
-    logger('Book Channel');
+    return true;
+});
+
+Broadcast::channel('book.section.subsection.{id}', function ($id) {
     return true;
 });

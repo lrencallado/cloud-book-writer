@@ -18,11 +18,13 @@ window.Echo = new Echo({
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     encrypted: true,//import.meta.env.VITE_PUSHER_APP_ENV === 'production',
     wsHost: window.location.hostname,
-    wssPort: 6001,
+    wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
+    wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
     csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
     forceTLS: import.meta.env.VITE_PUSHER_APP_ENV === 'production',
     authEndpoint: "/broadcasting/auth",
     disableStats: true,
+    // enabledTransports: ['ws', 'wss'],
 });
 Pusher.logToConsole = true;
 

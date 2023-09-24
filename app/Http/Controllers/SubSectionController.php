@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SubsectionContentUpdated;
 use App\Models\Book;
 use App\Models\Section;
 use App\Models\Subsection;
@@ -90,6 +91,10 @@ class SubsectionController extends Controller
 
         $subsection->content = $request->content;
         $subsection->save();
+
+        event(new SubsectionContentUpdated($subsection));
+
+        return;
     }
 
     /**

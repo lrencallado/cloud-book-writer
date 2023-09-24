@@ -34,6 +34,11 @@ const editorForm = useForm({
     content: props.current_subsection.content
 });
 
+Echo.private(`book.section.subsection.${props.current_subsection.id}`)
+    .listen('.subsection-content-updated', function(e) {
+        editorForm.content = e.subsection.content;
+});
+
 const createSubsection = () => {
     subsectionForm.post(route('book.section.subsection.store', { book: props.book.id, section: props.current_section.id }), {
         preserveScroll: true,
