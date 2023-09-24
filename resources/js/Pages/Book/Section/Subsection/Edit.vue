@@ -96,6 +96,7 @@ const closeModal = () => {
                         plugins: 'lists link image table code help wordcount'
                     }"
                     v-model="editorForm.content"
+                    @keyUp="updateSubsection"
                 />
                 <div class="w-4 py-2">
                     <PrimaryButton @click="updateSubsection">Update</PrimaryButton>
