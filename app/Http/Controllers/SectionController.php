@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SectionContentUpdated;
 use App\Models\Book;
 use App\Models\Section;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class SectionController extends Controller
@@ -30,8 +32,12 @@ class SectionController extends Controller
      */
     public function store(Request $request, Book $book)
     {
+        if ($book->isCollaborator($request->user())) {
+            abort(401);
+        }
+
         $request->validate([
-            'title' => 'required|string|max:255|unique:sections',
+            'title' => 'required|string|max:255',
         ]);
 
         Section::create([
@@ -39,10 +45,7 @@ class SectionController extends Controller
             'book_id' => $book->id,
         ]);
 
-        return Inertia::render('Book/Show', [
-            'book' => $book,
-            'sections' => $book->sections()->get()
-        ]);
+        return;
     }
 
     /**
@@ -76,6 +79,10 @@ class SectionController extends Controller
 
         $section->content = $request->content;
         $section->save();
+
+        event(new SectionContentUpdated($section));
+
+        return;
     }
 
     /**

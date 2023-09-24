@@ -8,7 +8,7 @@ import InputLabel from '@/Components/InputLabel.vue'
 import InputError from '@/Components/InputError.vue'
 import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
@@ -16,37 +16,95 @@ defineProps({
         type: Boolean,
     },
     books: {
-        type: Array
+        type: Object
     }
 });
 
-const showModal = ref(false);
+const showCreateBookModal = ref(false);
+const showCollaboratorRequestModal = ref(false);
 const titleInput = ref(null);
+const userRequests = ref([]);
 
-const form = useForm({
+const createBookForm = useForm({
     title: '',
 });
 
-const openModal = () => {
+const createCollabForm = useForm({
+    book_id: '',
+});
+
+const openCreateBookModal = () => {
     if (usePage().props.auth.user) {
-        showModal.value = true;
+        showCreateBookModal.value = true;
     } else {
         window.location = '/login';
     }
 };
 
-const closeModal = () => {
-    showModal.value = false;
-    form.reset();
+const closeCreateBookModal = (modal) => {
+    showCreateBookModal.value = false;
+    createBookForm.reset();
+};
+
+const openCollaboratorRequestModal = (bookId) => {
+    if (usePage().props.auth.user) {
+        showCollaboratorRequestModal.value = true;
+        createCollabForm.book_id = bookId;
+    } else {
+        window.location = '/login';
+    }
+};
+
+const closeCollaboratorRequestModal = (modal) => {
+    showCollaboratorRequestModal.value = false;
+    createCollabForm.reset();
 };
 
 const createBook = () => {
-    form.post(route('book.store'), {
+    createBookForm.post(route('book.store'), {
         preserveScroll: true,
-        onSuccess: () => closeModal(),
+        onSuccess: () => closeCreateBookModal(),
         onError: () => titleInput.value.focus(),
-        onFinish: () => form.reset(),
+        onFinish: () => createBookForm.reset(),
     });
+}
+
+const createCollaboratorRequestBook = () => {
+    createCollabForm.post(route('collaborator-request.store'), {
+        preserveScroll: true,
+        onSuccess: () => closeCreateBookModal(),
+        onFinish: () => createCollabForm.reset(),
+    });
+}
+
+const checkRequest = (userId, bookId, bookIndex, requests) => {
+    let isExisting = false;
+    let userRequest = {};
+
+    requests.forEach(request => {
+        if (request.requestor_id == userId && request.book_id == bookId) {
+            isExisting =  true;
+            userRequest.value = request;
+            //userRequests.value.splice(bookIndex, 0, request);
+            return;
+        }
+    });
+
+    return { has_request: isExisting, request: userRequest };
+}
+
+const getAuthor = (collaborators) => {
+    let author = {};
+
+    collaborators.forEach(collaborator => {
+        if (collaborator.pivot.role == 'Author') {
+            author = collaborator;
+
+            return
+        }
+    });
+
+    return author;
 }
 
 </script>
@@ -59,7 +117,7 @@ const createBook = () => {
         <div v-if="canLogin" class="sm:fixed sm:top-0 sm:right-0 p-6 text-right">
             <Link
                 v-if="$page.props.auth.user"
-                :href="route('dashboard')"
+                :href="route('book.index')"
                 class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                 >Manage Books</Link
             >
@@ -96,7 +154,7 @@ const createBook = () => {
             </div>
 
             <div class="mt-16">
-                <Modal :show="showModal">
+                <Modal :show="showCreateBookModal">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900">
                             Create a book
@@ -107,23 +165,23 @@ const createBook = () => {
                             <TextInput
                                 id="title"
                                 ref="titleInput"
-                                v-model="form.title"
+                                v-model="createBookForm.title"
                                 type="text"
                                 class="mt-1 block w-full"
                                 placeholder="Title"
                                 @keyup.enter="createBook"
                             />
 
-                            <InputError :message="form.errors.title" class="mt-2" />
+                            <InputError :message="createBookForm.errors.title" class="mt-2" />
                         </div>
 
                         <div class="mt-6 flex justify-end">
-                            <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+                            <SecondaryButton @click="closeCreateBookModal"> Cancel </SecondaryButton>
 
                             <PrimaryButton
                                 class="ml-3"
-                                :class="{ 'opacity-25': form.processing }"
-                                :disabled="form.processing"
+                                :class="{ 'opacity-25': createBookForm.processing }"
+                                :disabled="createBookForm.processing"
                                 @click="createBook"
                             >
                                 Create
@@ -131,10 +189,29 @@ const createBook = () => {
                         </div>
                     </div>
                 </Modal>
+                <Modal :show="showCollaboratorRequestModal">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900">
+                            Are you sure you want to request for access of the book?
+                        </h2>
+                        <div class="mt-6 flex justify-end">
+                            <SecondaryButton @click="closeCollaboratorRequestModal"> Cancel </SecondaryButton>
+
+                            <PrimaryButton
+                                class="ml-3"
+                                :class="{ 'opacity-25': createCollabForm.processing }"
+                                :disabled="createCollabForm.processing"
+                                @click="createCollaboratorRequestBook"
+                            >
+                                Confirm
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </Modal>
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-6 lg:gap-8 w-3/4 mx-auto">
                     <a
-                        @click="openModal"
-                        class="scale-100 p-6 text-center text-lg cursor-pointer text-gray-500 dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
+                        @click="openCreateBookModal"
+                        class="scale-100 p-6 text-center text-2xl cursor-pointer text-gray-500 dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
                     >
                         <div class="mx-auto">
                             <!-- <div
@@ -144,52 +221,114 @@ const createBook = () => {
                             Unleash Your Imagination in the Cloud Book Writer - Where Every Story Begins. Start Writing Your Book Today!
                         </div>
                     </a>
-                    <PrimaryButton class="w-36 -mt-4 mx-auto" @click="openModal">Create a book</PrimaryButton>
-                    <div v-for="book in books.data">
-                        <a
-                            class="scale-100 p-6 mb-4 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] hover:border-2 hover:border-red-500 transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
-                        >
-                            <div>
-                                <div
-                                    class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full"
+                    <PrimaryButton class="w-36 -mt-4 mx-auto" @click="openCreateBookModal">Create a book</PrimaryButton>
+                    <div v-for="(book, index) in props.books.data">
+                        <div v-if="$page.props.auth.user">
+                            <div v-if="currentRequest = checkRequest($page.props.auth.user.id, book.id, index, book.all_collaborator_requests)">
+                                <a
+                                    :href="route('book.show', { book: book.id })"
+                                    class="scale-100 p-6 mb-4 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] hover:border-2 hover:border-red-500 transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
                                 >
+                                    <div>
+                                        <div
+                                            class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                class="w-7 h-7 stroke-red-500"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                                                />
+                                            </svg>
+                                        </div>
+
+                                        <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{{ book.title }}</h2>
+
+                                        <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin ac purus eu justo viverra scelerisque. Sed nec arcu eu odio condimentum posuere. Vivamus nec eleifend nulla. In cursus, turpis nec condimentum pellentesque, lectus ex dignissim odio, a semper sapien felis in justo. Vestibulum volutpat euismod justo, ac tincidunt justo tempus nec. Phasellus sagittis nisi vel velit rhoncus, id fringilla urna luctus.
+                                        </p>
+
+                                        <div v-if="!currentRequest.has_request">
+                                            <PrimaryButton v-if="$page.props.auth.user && $page.props.auth.user.id != getAuthor(book.collaborators).id " class="w-auto mx-auto mt-2" @click="openCollaboratorRequestModal(book.id)">Ask to collab</PrimaryButton>
+                                            <SecondaryButton v-else class="w-auto mx-auto mt-2">Author</SecondaryButton>
+                                        </div>
+                                        <div v-else>
+                                            <span class="mt-2 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                                                {{ currentRequest.request.value.status == 'Approved' ? 'Collaborator' : currentRequest.request.value.status }}
+                                            </span>
+                                            <!-- <SecondaryButton class="w-auto mx-auto mt-2">{{ currentRequest.request}}</SecondaryButton> -->
+                                        </div>
+                                    </div>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke-width="1.5"
-                                        class="w-7 h-7 stroke-red-500"
+                                        class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6"
                                     >
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
-                                            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
                                         />
                                     </svg>
-                                </div>
-
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{{ book.title }}</h2>
-
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin ac purus eu justo viverra scelerisque. Sed nec arcu eu odio condimentum posuere. Vivamus nec eleifend nulla. In cursus, turpis nec condimentum pellentesque, lectus ex dignissim odio, a semper sapien felis in justo. Vestibulum volutpat euismod justo, ac tincidunt justo tempus nec. Phasellus sagittis nisi vel velit rhoncus, id fringilla urna luctus.
-                                </p>
-                                <PrimaryButton v-if="$page.props.auth.user && $page.props.auth.user.id != book.collaborators[0].id" class="w-36 mx-auto mt-2" @click="openModal">Ask to collab</PrimaryButton>
-                                <PrimaryButton v-else class="w-36 mx-auto mt-2" @click="openModal">Ask to collab</PrimaryButton>
+                                </a>
                             </div>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                                />
-                            </svg>
-                        </a>
+                        </div>
+                        <div v-else>
+                            <div>
+                                <a
+                                    class="scale-100 p-6 mb-4 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] hover:border-2 hover:border-red-500 transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
+                                >
+                                    <div>
+                                        <div
+                                            class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                class="w-7 h-7 stroke-red-500"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                                                />
+                                            </svg>
+                                        </div>
+
+                                        <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">{{ book.title }}</h2>
+
+                                        <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin ac purus eu justo viverra scelerisque. Sed nec arcu eu odio condimentum posuere. Vivamus nec eleifend nulla. In cursus, turpis nec condimentum pellentesque, lectus ex dignissim odio, a semper sapien felis in justo. Vestibulum volutpat euismod justo, ac tincidunt justo tempus nec. Phasellus sagittis nisi vel velit rhoncus, id fringilla urna luctus.
+                                        </p>
+
+                                        <PrimaryButton class="w-auto mx-auto mt-2" @click="openCollaboratorRequestModal(book.id)">Ask to collab</PrimaryButton>
+                                    </div>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

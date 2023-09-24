@@ -47,6 +47,16 @@ class User extends Authenticatable
 
     public function books()
     {
-        return $this->hasMany(Book::class, 'book_users')->withPivot('role');
+        return $this->belongsToMany(Book::class, 'book_users')->withPivot('role');
+    }
+
+    public function authorCollaboratorRequests()
+    {
+        return $this->hasMany(CollaboratorRequest::class, 'author_id');
+    }
+
+    public function collaboratorRequests()
+    {
+        return $this->hasMany(CollaboratorRequest::class, 'requestor_id');
     }
 }

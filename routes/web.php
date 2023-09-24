@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CollaboratorRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubsectionController;
 use App\Models\Book;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,11 +21,20 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
+    $books = Book::orderByDesc('created_at')->with('collaborators');
+
+    // We'll not display the collaborator requests publicly
+    if ($request->user()) {
+        $books->with('allCollaboratorRequests');
+    }
+
+    $books = $books->paginate();
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'books' => Book::with('collaborators')->paginate()
+        'books' => $books,
     ]);
 })->name('home');
 
@@ -39,6 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('book', BookController::class);
     Route::resource('book.section', SectionController::class);
     Route::resource('book.section.subsection', SubsectionController::class);
+
+    Route::resource('collaborator-request', CollaboratorRequestController::class);
 });
 
 require __DIR__.'/auth.php';

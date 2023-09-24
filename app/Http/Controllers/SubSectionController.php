@@ -31,8 +31,12 @@ class SubsectionController extends Controller
      */
     public function store(Request $request, Book $book, Section $section)
     {
+        if ($book->isCollaborator($request->user())) {
+            abort(401);
+        }
+
         $request->validate([
-            'title' => 'required|string|max:255|unique:subsections'
+            'title' => 'required|string|max:255'
         ]);
 
         if ($request->parent_subsection_id) {
@@ -44,25 +48,14 @@ class SubsectionController extends Controller
             $childSubsection->parentSubsection()->associate($parentSubsection->id);
 
             $childSubsection->save();
-
-            return Inertia::render('Book/Section/Subsection/Edit', [
-                'book' => $book,
-                'sections' => $book->sections()->get(),
-                'current_section' => $section,
-                'current_subsection' => $parentSubsection
-            ]);
-
         } else {
             Subsection::create([
                 'title' => $request->title,
                 'section_id' => $section->id
             ]);
-
-            return Inertia::render('Book/Section/Edit', [
-                'book' => $book,
-                'sections' => $book->sections()->get(),
-            ]);
         }
+
+        return;
     }
 
     /**

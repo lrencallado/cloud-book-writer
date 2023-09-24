@@ -18,6 +18,8 @@
         "vue": "^3.2.41"
     },
     "dependencies": {
-        "@tinymce/tinymce-vue": "^5.1.1"
+        "@tinymce/tinymce-vue": "^5.1.1",
+        "laravel-echo": "^1.15.3",
+        "pusher-js": "^8.3.0"
     }
 }

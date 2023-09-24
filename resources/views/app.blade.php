@@ -17,5 +17,6 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     </body>
 </html>

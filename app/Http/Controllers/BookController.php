@@ -11,9 +11,11 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return Inertia::render('Book/Index', [
+            'books' => $request->user()->books()->paginate(),
+        ]);
     }
 
     /**
@@ -45,12 +47,16 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Book $book)
+    public function show(Request $request, Book $book)
     {
-        return Inertia::render('Book/Show', [
-            'book' => $book,
-            'sections' => $book->sections()->get()
-        ]);
+        if ($book->collaborators->contains($request->user())) {
+            return Inertia::render('Book/Show', [
+                'book' => $book,
+                'sections' => $book->sections()->get()
+            ]);
+        }
+
+        abort(401);
     }
 
     /**
