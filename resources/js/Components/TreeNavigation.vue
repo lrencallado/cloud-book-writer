@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+import RecursiveSubsection from './RecursiveSubsection.vue';
 
 defineProps({
     book: {},
@@ -9,10 +10,16 @@ defineProps({
 })
 
 const showSections = ref(true);
+const showSubsections = ref(true);
 
-const toggleChildNodes = () => {
+const toggleSections = () => {
     showSections.value = !showSections.value;
 };
+
+const toggleSubsections = () => {
+    //showSubsections.value = !showSubsections.value;
+};
+
 
 const buttonText = computed(() => (showChildNodes.value ? 'Hide Child Nodes' : 'Show Child Nodes'));
 
@@ -34,7 +41,7 @@ const buttonText = computed(() => (showChildNodes.value ? 'Hide Child Nodes' : '
                     <li>
                         <button
                             class="flex items-center text-gray-800 hover:text-blue-500"
-                            @click="toggleChildNodes()"
+                            @click="toggleSections()"
                         >
                             <svg fill="none" class="w-4" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"></path>
@@ -49,7 +56,19 @@ const buttonText = computed(() => (showChildNodes.value ? 'Hide Child Nodes' : '
                                     </svg>
                                     {{ section.title}}
                                 </a>
-                                <ul v-for="subsection in section.sub_sections" class="space-y-2 ml-4">
+                                <div v-if="section.subsections.length > 0" class="ml-4">
+                                    <button
+                                        class="flex items-center text-gray-800 hover:text-blue-500"
+                                        @click="toggleSubsections()"
+                                    >
+                                        <svg fill="none" class="w-4" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"></path>
+                                        </svg>
+                                        <span id="toggleText">Subsections</span>
+                                    </button>
+                                </div>
+
+                                <ul v-for="subsection in section.subsections" class="ml-8" v-show="showSubsections">
                                     <li>
                                         <a :href="route('book.section.subsection.edit', { book:book.id, section: section.id, subsection: subsection.id })" class="flex items-center text-gray-800 hover:text-blue-500">
                                             <svg fill="none" class="w-4" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -58,6 +77,7 @@ const buttonText = computed(() => (showChildNodes.value ? 'Hide Child Nodes' : '
                                             {{ subsection.title}}
                                         </a>
                                     </li>
+                                    <RecursiveSubsection :book="book" :section="section" :subsections="subsection.child_subsections"/>
                                 </ul>
                             </li>
                         </ul>

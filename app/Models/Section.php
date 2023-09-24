@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -15,15 +16,15 @@ class Section extends Model
         'content',
     ];
 
-    protected $with = ['subSections'];
+    protected $with = ['subsections'];
 
     public function book()
     {
         return $this->belongsTo(Book::class);
     }
 
-    public function subSections()
+    public function subsections()
     {
-        return $this->hasMany(SubSection::class);
+        return $this->hasMany(Subsection::class)->where('parent_id', null);
     }
 }

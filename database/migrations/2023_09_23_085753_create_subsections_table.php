@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sub_sections', function (Blueprint $table) {
+        Schema::create('subsections', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->longText('content')->nullable();
             $table->unsignedBigInteger('section_id');
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sub_sections');
+        Schema::dropIfExists('subsections');
     }
 };

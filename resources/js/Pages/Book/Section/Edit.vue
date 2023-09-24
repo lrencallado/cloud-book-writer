@@ -25,7 +25,7 @@ const showModal = ref(false);
 const tinyMceApiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
 
 const subsectionForm = useForm({
-    title: ''
+    title: '',
 });
 
 const editorForm = useForm({
@@ -64,7 +64,7 @@ const closeModal = () => {
         <template #header>
             <div class="flex justify-between">
                 <div>
-                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}} Book</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}}</h2>
                 </div>
                 <div>
                     <PrimaryButton @click="showModal = true">Create Subsection</PrimaryButton>

@@ -26,7 +26,7 @@ const showModal = ref(false);
 const form = useForm({
     title: ''
 });
-
+console.log(props.book)
 const createSection = () => {
     form.post(route('book.section.store', { book: props.book.id }), {
         preserveScroll: true,
@@ -50,7 +50,7 @@ const closeModal = () => {
         <template #header>
             <div class="flex justify-between">
                 <div>
-                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}} Book</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}}</h2>
                 </div>
                 <div>
                     <PrimaryButton @click="showModal = true">Create Section</PrimaryButton>

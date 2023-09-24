@@ -13,7 +13,10 @@ import Editor from '@tinymce/tinymce-vue'
 
 const props = defineProps({
     book: {},
-    sections: [],
+    sections: {
+        type: Array
+    },
+    current_section: {},
     current_subsection: {},
 });
 
@@ -23,7 +26,8 @@ const showModal = ref(false);
 const tinyMceApiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
 
 const subsectionForm = useForm({
-    title: ''
+    title: '',
+    parent_subsection_id: props.current_subsection.id
 });
 
 const editorForm = useForm({
@@ -37,12 +41,18 @@ const createSubsection = () => {
             closeModal();
         },
         onError: () => titleInput.value.focus(),
-        onFinish: () => form.reset(),
+        onFinish: () => subsectionForm.reset(),
     });
 }
 
 const updateSubsection = () => {
-    editorForm.patch(route('book.section.update', { book: props.book.id, section: props.current_section.id }), {
+    editorForm.patch(route('book.section.subsection.update',
+            {
+                book: props.book.id,
+                section: props.current_section.id,
+                subsection: props.current_subsection.id
+            }
+        ), {
         preserveScroll: true,
         onSuccess: () => {
 
@@ -62,7 +72,7 @@ const closeModal = () => {
         <template #header>
             <div class="flex justify-between">
                 <div>
-                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}} Book</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{props.book.title}}</h2>
                 </div>
                 <div>
                     <PrimaryButton @click="showModal = true">Create Subsection</PrimaryButton>
