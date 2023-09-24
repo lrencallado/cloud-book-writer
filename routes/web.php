@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CollaboratorRequestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PusherAuthController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubsectionController;
 use App\Models\Book;
@@ -54,15 +55,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('collaborator-request', CollaboratorRequestController::class);
 
+    Route::post('/broadcasting/auth', [PusherAuthController::class, 'auth']);
 });
 
-Route::post('/broadcasting/auth', function(Request $request) {
-    if (!$request->user()) {
-        return abort(403, 'Unauthorized');
-    }
-
-    // Return the authenticated user's information
-    return $request->user();
-});
 
 require __DIR__.'/auth.php';

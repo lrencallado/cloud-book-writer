@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 Echo.private(`book.section.${props.current_section.id}`)
-    .listen('SectionContentUpdated', (e) => {
+    .listen('.section-content-updated', function(e) {
         console.log(e)
         props.current_section = e.section;
 });

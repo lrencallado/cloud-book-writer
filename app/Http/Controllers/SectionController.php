@@ -81,6 +81,7 @@ class SectionController extends Controller
         $section->save();
 
         event(new SectionContentUpdated($section));
+        //SectionContentUpdated::dispatch($section);
 
         return;
     }

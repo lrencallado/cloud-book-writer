@@ -1,5 +1,7 @@
 <?php
 
+use App\Events\SectionContentUpdated;
+use App\Models\Section;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -18,5 +20,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('book.section.{id}', function ($id) {
+    logger('Book Channel');
     return true;
 });

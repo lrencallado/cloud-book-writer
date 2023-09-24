@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SectionContentUpdated
+class SectionContentUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -28,13 +28,15 @@ class SectionContentUpdated
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn(): PrivateChannel
     {
+        logger('broadcasting');
+
         return new PrivateChannel('book.section.' . $this->section->id);
     }
 
     public function broadcastAs()
-  {
-      return 'section-content-updated';
-  }
+    {
+        return 'section-content-updated';
+    }
 }
