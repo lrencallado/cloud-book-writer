@@ -38,7 +38,7 @@ Echo.private(`book.section.${props.current_section.id}`)
 });
 
 const createSubsection = () => {
-    subsectionForm.post(route('book.section.subsection.store', { book: props.book.id, section: props.current_section.id }), {
+    subsectionForm.post(route('books.sections.subsections.store', { book: props.book.id, section: props.current_section.id }), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
@@ -49,12 +49,14 @@ const createSubsection = () => {
 }
 
 const updateSection = () => {
-    editorForm.patch(route('book.section.update', { book: props.book.id, section: props.current_section.id }), {
-        preserveScroll: true,
-        onSuccess: () => {
+    if (props.current_section.content !== editorForm.content) {
+        editorForm.patch(route('books.sections.update', { book: props.book.id, section: props.current_section.id }), {
+            preserveScroll: true,
+            onSuccess: () => {
 
-        },
-    });
+            },
+        });
+    }
 }
 
 const closeModal = () => {

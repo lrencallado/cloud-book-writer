@@ -92,7 +92,7 @@ class SubsectionController extends Controller
         $subsection->content = $request->content;
         $subsection->save();
 
-        event(new SubsectionContentUpdated($subsection));
+        broadcast(new SubsectionContentUpdated($subsection))->toOthers();
 
         return;
     }

@@ -28,7 +28,7 @@ const form = useForm({
 });
 console.log(props.book)
 const createSection = () => {
-    form.post(route('book.section.store', { book: props.book.id }), {
+    form.post(route('books.sections.store', { book: props.book.id }), {
         preserveScroll: true,
         onSuccess: (data) => {
             closeModal();

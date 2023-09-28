@@ -49,9 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('book', BookController::class);
-    Route::resource('book.section', SectionController::class);
-    Route::resource('book.section.subsection', SubsectionController::class);
+    Route::resource('books', BookController::class);
+    Route::resource('books.sections', SectionController::class);
+    Route::resource('books.sections.subsections', SubsectionController::class);
 
     Route::resource('collaborator-request', CollaboratorRequestController::class);
 

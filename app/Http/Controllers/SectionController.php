@@ -80,7 +80,7 @@ class SectionController extends Controller
         $section->content = $request->content;
         $section->save();
 
-        broadcast(new SectionContentUpdated($section));
+        broadcast(new SectionContentUpdated($section))->toOthers();
 
         return;
     }
