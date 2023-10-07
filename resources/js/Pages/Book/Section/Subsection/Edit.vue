@@ -95,6 +95,7 @@ const closeModal = () => {
                 <Editor
                     :api-key="tinyMceApiKey"
                     :init="{
+                        height: 500,
                         plugins: 'lists link image table code help wordcount'
                     }"
                     v-model="editorForm.content"

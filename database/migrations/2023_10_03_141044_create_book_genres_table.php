@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sections', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->longText('content')->nullable();
+        Schema::create('book_genres', function (Blueprint $table) {
             $table->unsignedBigInteger('book_id');
-            $table->boolean('is_published')->default(false);
-            $table->timestamps();
+            $table->unsignedBigInteger('genre_id');
+            $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
+            $table->foreign('genre_id')->references('id')->on('genres')->onDelete('cascade');
+            $table->primary(['book_id', 'genre_id']);
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sections');
+        Schema::dropIfExists('book_genres');
     }
 };

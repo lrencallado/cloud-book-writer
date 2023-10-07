@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -23,7 +24,9 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Book/Create', [
+            'genres' => Genre::all(),
+        ]);
     }
 
     /**
@@ -31,8 +34,10 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         $request->validate([
             'title' => 'required|string|max:255|unique:books',
+            'description' => 'required|string'
         ]);
 
         $book = Book::create([

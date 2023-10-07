@@ -17,6 +17,7 @@ return new class extends Migration
             $table->longText('content')->nullable();
             $table->unsignedBigInteger('section_id');
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->boolean('is_published')->default(false);
             $table->timestamps();
         });
     }

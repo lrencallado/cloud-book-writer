@@ -48,4 +48,14 @@ class Book extends Model
             return $collaborator->id === $user->id && $collaborator->pivot->role === 'Collaborator';
         });
     }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'book_genres');
+    }
+
+    public function addGenre()
+    {
+
+    }
 }

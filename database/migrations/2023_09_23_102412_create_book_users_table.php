@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('book_id');
             $table->unsignedBigInteger('user_id');
             $table->enum('role', ['Author', 'Collaborator']);
-            $table->timestamps();
         });
     }
 

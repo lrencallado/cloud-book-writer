@@ -85,8 +85,10 @@ const closeModal = () => {
             <div class="md:w-[70%] bg-white p-4 grid content-center">
                 <!-- Content for the second column -->
                 <Editor
+                    @show="console.log('shown')"
                     :api-key="tinyMceApiKey"
                     :init="{
+                        height: 500,
                         plugins: 'lists link image table code help wordcount'
                     }"
                     v-model="editorForm.content"
