@@ -45,6 +45,10 @@ const emitSelectedOptions = () => {
     emit('update:modelValue', selectedOptions.value);
 };
 
+const unselectOption = (option) => {
+    emit('update:modelValue', option);
+}
+
 const closeOnEscape = (e) => {
     if (open.value && e.key === 'Escape') {
         open.value = false;
@@ -76,6 +80,7 @@ onUnmounted(() => {
             class="border rounded-md p-2 w-full"
             type="text"
             :placeholder="props.placeholder"
+            @click="toggleDropdown"
         />
         <!-- Up Arrow SVG Icon -->
         <svg
@@ -114,6 +119,14 @@ onUnmounted(() => {
                     </label>
                 </li>
             </ul>
+        </div>
+        <div v-if="options.length > 0" class="mt-4 flex flex-wrap gap-y-1">
+            <div v-for="option in options">
+                <span v-if="selectedOptions.includes(option.value)" class="mr-2 rounded-md bg-blue-500 text-white py-1 px-2">
+                    {{ option.label }}
+                    <button type="button" class="font-extrabold text-lg" @click="unselectOption(option.value)">x</button>
+                </span>
+            </div>
         </div>
     </div>
 </template>

@@ -3,9 +3,6 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import Modal from '@/Components/Modal.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import InputLabel from '@/Components/InputLabel.vue'
-import InputError from '@/Components/InputError.vue'
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -20,31 +17,12 @@ const props = defineProps({
     }
 });
 
-const showCreateBookModal = ref(false);
 const showCollaboratorRequestModal = ref(false);
-const titleInput = ref(null);
 const userRequests = ref([]);
-
-const createBookForm = useForm({
-    title: '',
-});
 
 const createCollabForm = useForm({
     book_id: '',
 });
-
-const openCreateBookModal = () => {
-    if (usePage().props.auth.user) {
-        showCreateBookModal.value = true;
-    } else {
-        window.location = '/login';
-    }
-};
-
-const closeCreateBookModal = (modal) => {
-    showCreateBookModal.value = false;
-    createBookForm.reset();
-};
 
 const openCollaboratorRequestModal = (bookId) => {
     if (usePage().props.auth.user) {
@@ -60,19 +38,10 @@ const closeCollaboratorRequestModal = (modal) => {
     createCollabForm.reset();
 };
 
-const createBook = () => {
-    createBookForm.post(route('books.store'), {
-        preserveScroll: true,
-        onSuccess: () => closeCreateBookModal(),
-        onError: () => titleInput.value.focus(),
-        onFinish: () => createBookForm.reset(),
-    });
-}
-
 const createCollaboratorRequestBook = () => {
     createCollabForm.post(route('collaborator-request.store'), {
         preserveScroll: true,
-        onSuccess: () => closeCreateBookModal(),
+        onSuccess: () => closeCollaboratorRequestModal(),
         onFinish: () => createCollabForm.reset(),
     });
 }
@@ -154,41 +123,6 @@ const getAuthor = (collaborators) => {
             </div>
 
             <div class="mt-16">
-                <Modal :show="showCreateBookModal">
-                    <div class="p-6">
-                        <h2 class="text-lg font-medium text-gray-900">
-                            Create a book
-                        </h2>
-                        <div class="mt-6">
-                            <InputLabel for="title" value="title" class="sr-only" />
-
-                            <TextInput
-                                id="title"
-                                ref="titleInput"
-                                v-model="createBookForm.title"
-                                type="text"
-                                class="mt-1 block w-full"
-                                placeholder="Title"
-                                @keyup.enter="createBook"
-                            />
-
-                            <InputError :message="createBookForm.errors.title" class="mt-2" />
-                        </div>
-
-                        <div class="mt-6 flex justify-end">
-                            <SecondaryButton @click="closeCreateBookModal"> Cancel </SecondaryButton>
-
-                            <PrimaryButton
-                                class="ml-3"
-                                :class="{ 'opacity-25': createBookForm.processing }"
-                                :disabled="createBookForm.processing"
-                                @click="createBook"
-                            >
-                                Create
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </Modal>
                 <Modal :show="showCollaboratorRequestModal">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900">
@@ -216,7 +150,11 @@ const getAuthor = (collaborators) => {
                             Unleash Your Imagination in the Cloud Book Writer - Where Every Story Begins. Start Writing Your Book Today!
                         </div>
                     </a>
-                    <PrimaryButton class="w-36 -mt-4 mx-auto" @click="openCreateBookModal">Create a book</PrimaryButton>
+                    <a :href="route('books.create')"
+                        class="w-36 -mt-4 mx-auto inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                        >
+                        Create a book
+                    </a>
                     <div v-for="(book, index) in props.books.data">
                         <div v-if="$page.props.auth.user">
                             <div v-if="currentRequest = checkRequest($page.props.auth.user.id, book.id, index, book.all_collaborator_requests)">
@@ -321,7 +259,7 @@ const getAuthor = (collaborators) => {
                                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                                 />
                             </svg>
-                            Sponsor
+                            2023 Cloud Book Writer © All rights Reserved.
                         </a>
                     </div>
                 </div>

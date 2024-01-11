@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import { ref } from 'vue';
-import DropdownSelect from '@/Components/DropdownSelect.vue';
+import DropdownMultipleSelect from '@/Components/DropdownMultipleSelect.vue';
 
 const props = defineProps({
     genres: {
@@ -78,7 +78,7 @@ const create = () => {
                                 </div>
                                 <div>
                                     <InputLabel for="genres" value="Genres" />
-                                    <DropdownSelect class="mt-1" :options="dropdownOptions" v-model="form.genres"/>
+                                    <DropdownMultipleSelect class="mt-1" :options="dropdownOptions" v-model="form.genres"/>
                                     <InputError class="mt-2" :message="form.errors.genres" />
                                 </div>
                                 <div class="flex items-center gap-4">

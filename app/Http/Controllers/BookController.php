@@ -34,19 +34,24 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
         $request->validate([
             'title' => 'required|string|max:255|unique:books',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'genres' => 'required',
         ]);
 
         $book = Book::create([
-            'title' => $request->title
+            'title' => $request->title,
+            'description' => $request->description,
         ]);
 
         $book->addCollaborator($request->user(), 'Author');
 
-        return Inertia::location("book/{$book->id}");
+        foreach ($request->genres as $genre) {
+            $book->addGenre($genre);
+        }
+
+        return Inertia::location(route('books.show', [ 'book' => $book->id ]));
     }
 
     /**
