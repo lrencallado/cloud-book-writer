@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::get('/', function (Request $request) {
 
     $books = $books->paginate();
 
-    return Inertia::render('Welcome', [
+    return Inertia::render('Home', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'books' => $books,
@@ -57,6 +58,5 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/broadcasting/auth', [PusherAuthController::class, 'auth']);
 });
-
 
 require __DIR__.'/auth.php';
